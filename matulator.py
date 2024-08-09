@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 
+# Prints a simple ASCII art banner at the beginning of the script.
 def print_ascii_art():
     ascii_art = r"""
    -------------------------------------------------------
@@ -18,6 +19,7 @@ def print_ascii_art():
     """
     print(ascii_art)
 
+# Executes a shell command and handles potential errors.
 def run_command(command):
     try:
         subprocess.run(command, check=True)
@@ -25,6 +27,7 @@ def run_command(command):
         print(f"Error: Command '{' '.join(command)}' failed with exit code {e.returncode}.", file=sys.stderr)
         sys.exit(e.returncode)
 
+# Determines the Linux distribution by reading the /etc/os-release file.
 def detect_distro():
     distro = "unknown"
     try:
@@ -38,6 +41,7 @@ def detect_distro():
         sys.exit(1)
     return distro
 
+# Checks if the root filesystem is mounted as read-only, which would prevent the script from making changes.
 def check_read_only_filesystem():
     try:
         output = subprocess.run(["mount", "-o", "remount,rw", "/"], capture_output=True, text=True)
@@ -48,11 +52,13 @@ def check_read_only_filesystem():
         print("Error: Failed to check the root filesystem status.", file=sys.stderr)
         sys.exit(1)
 
+# Adds the Lutris PPA (Personal Package Archive) to the system's software sources, allowing you to install Lutris.
 def add_lutris_ppa():
     print("Adding the Lutris PPA for Ubuntu...")
     run_command(["sudo", "add-apt-repository", "ppa:lutris-team/lutris", "-y"])
     run_command(["sudo", "apt", "update"])
 
+# Installs a set of packages based on the detected Linux distribution.
 def install_packages(distro):
     kernel_version = subprocess.run(["uname", "-r"], capture_output=True, text=True).stdout.strip()
     
@@ -81,6 +87,7 @@ def install_packages(distro):
         print(f"Error: This script is not designed to run on {distro}. Exiting.", file=sys.stderr)
         sys.exit(1)
 
+# Downloads and installs Proton-GE, a compatibility layer for running Windows games on Linux.
 def setup_proton_ge():
     home_dir = os.path.expanduser("~")
     download_path = os.path.join(home_dir, "proton-ge.tar.gz")
@@ -92,6 +99,7 @@ def setup_proton_ge():
     os.makedirs(compatibility_dir, exist_ok=True)
     run_command(["tar", "-xzf", download_path, "-C", compatibility_dir])
 
+# Prompts the user to enter a download link for a Tiny10 Windows image and downloads it.
 def download_windows_image():
     download_link = input("Please enter the download link for Tiny10 Windows image: ").strip()
     
@@ -104,11 +112,13 @@ def download_windows_image():
     
     run_command(["axel", "-n", "10", download_link, "-o", download_path])
 
+# Loads the kvm, kvm_intel, and kvm_amd kernel modules, which are necessary for virtualization.
 def setup_kernel_modules():
     modules = ["kvm", "kvm_intel", "kvm_amd"]
     for module in modules:
         run_command(["sudo", "modprobe", module])
 
+# Prompts the user to confirm if they want to reboot the system after the setup is complete.
 def confirm_reboot():
     while True:
         first_confirmation = input("Do you want to reboot now? (yes/no): ").strip().lower()
@@ -127,7 +137,7 @@ def confirm_reboot():
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
 
-# actually run  the thing 
+# Orchestrates the entire script.
 def main():
     print_ascii_art()
     check_read_only_filesystem()
@@ -139,6 +149,7 @@ def main():
     setup_kernel_modules()
     confirm_reboot()
 
+# Ensures that the main() function is only executed when the script is run directly (not imported as a module).
 if __name__ == "__main__":
     main()
 
