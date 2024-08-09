@@ -27,7 +27,7 @@ This repository contains a Python script designed to automate the setup of a gam
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/repo-name.git
+   git clone https://github.com/sillyncikdev/MATULATOR.git
    cd repo-name
    ```
 
