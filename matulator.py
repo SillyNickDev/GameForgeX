@@ -54,8 +54,14 @@ def check_read_only_filesystem():
 
 # Adds the Lutris PPA (Personal Package Archive) to the system's software sources, allowing you to install Lutris.
 def add_lutris_ppa():
-    print("Adding the Lutris PPA for Ubuntu...")
+    print("Adding the Lutris PPA...")
     run_command(["sudo", "add-apt-repository", "ppa:lutris-team/lutris", "-y"])
+    run_command(["sudo", "apt", "update"])
+
+# Adds the i386 repository for Debian-based distros
+def add_i386_repo():
+    print("Adding the i386 repository...")
+    run_command(["sudo", "apt-add-repository", "multiverse"])
     run_command(["sudo", "apt", "update"])
 
 # Installs a set of packages based on the detected Linux distribution.
@@ -71,9 +77,10 @@ def install_packages(distro):
     if distro in ["ubuntu", "debian"]:
         run_command(["sudo", "apt", "update"])
 
-        if distro == "ubuntu":
-            # Add the Lutris PPA before attempting to install
-            add_lutris_ppa()
+        # Add the Lutris PPA before attempting to install
+        add_lutris_ppa()
+        # Add the i386 repository for Debian-based distros
+        add_i386_repo()
 
         # Install Lutris and other packages
         packages.append("lutris")
